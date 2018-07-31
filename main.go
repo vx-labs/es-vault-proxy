@@ -71,6 +71,9 @@ func run(vault *api.Client, configKey string) error {
 	httpc := http.DefaultClient
 	httpc.Timeout = 5 * time.Second
 	httpc.Transport = http.DefaultTransport
+	if proxy := os.Getenv("HTTPS_PROXY"); proxy != "" {
+		log.Printf("proxy: %s", proxy)
+	}
 	listen := "[::]:9200"
 
 	log.Printf("ES proxy is listening on %s", listen)
@@ -128,6 +131,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("failed to create vault client: %v", err)
 			}
+			loadVaultToken(vault)
 			err = run(vault, configKey)
 			if err != nil {
 				log.Println(err)
