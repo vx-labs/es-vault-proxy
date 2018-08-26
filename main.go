@@ -88,6 +88,10 @@ func run(vault *api.Client, configKey string) error {
 				return
 			}
 			urlString := fmt.Sprintf("%s%s", config.URL, r.URL.Path)
+			query := r.URL.Query().Encode()
+			if query != "" {
+				urlString = fmt.Sprintf("%s?%s", urlString, query)
+			}
 			egressReq, err := http.NewRequest(r.Method, urlString, r.Body)
 			if err != nil {
 				log.Println(err)
