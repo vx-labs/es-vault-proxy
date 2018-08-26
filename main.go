@@ -87,7 +87,7 @@ func run(vault *api.Client, configKey string) error {
 				json.NewEncoder(w).Encode(err)
 				return
 			}
-			urlString := fmt.Sprintf("%s/%s", config.URL, r.URL.Path)
+			urlString := fmt.Sprintf("%s%s", config.URL, r.URL.Path)
 			egressReq, err := http.NewRequest(r.Method, urlString, r.Body)
 			if err != nil {
 				log.Println(err)
@@ -111,6 +111,9 @@ func run(vault *api.Client, configKey string) error {
 			r.Body.Close()
 
 			log.Printf("outgoing: %s %s %d", egressReq.Method, egressReq.URL.String(), resp.StatusCode)
+			if resp.StatusCode > 399 {
+				log.Println(resp.Status)
+			}
 			w.WriteHeader(resp.StatusCode)
 			if resp.Body != nil {
 				io.Copy(w, resp.Body)
