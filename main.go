@@ -108,11 +108,15 @@ func run(vault *api.Client, configKey string) error {
 				json.NewEncoder(w).Encode(err)
 				return
 			}
-			r.Body.Close()
 
 			log.Printf("outgoing: %s %s %d", egressReq.Method, egressReq.URL.String(), resp.StatusCode)
-			if resp.StatusCode > 399 {
-				log.Println(resp.Status)
+			for name, values := range resp.Header {
+				for _, value := range values {
+					if resp.StatusCode > 399 {
+						log.Printf("  %s: %s", name, value)
+					}
+					w.Header().Add(name, value)
+				}
 			}
 			w.WriteHeader(resp.StatusCode)
 			if resp.Body != nil {
